@@ -2,8 +2,10 @@ const mongoose = require('mongoose');
 
 const TaskSchema = new mongoose.Schema(
   {
-    // _id: mongoose.Schema.Types.ObjectId,
-    task: String,
+    task: {
+      type: String,
+      require: true
+    },
   },
   {
     timestamps: true,
