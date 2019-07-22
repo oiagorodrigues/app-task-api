@@ -7,6 +7,10 @@ function GenericController(model) {
     try {
       const result = await this.service.list();
 
+      if (!result.data || !result.data.length) {
+        return res.status(204).json([]);
+      }
+
       return res.json({
         ...result,
         length: result.data.length,
@@ -31,7 +35,7 @@ function GenericController(model) {
       const result = await this.service.get(req.params.id);
 
       if (!result.data) {
-        return res.json({});
+        return res.status(204).json({});
       }
 
       return res.json(result);
