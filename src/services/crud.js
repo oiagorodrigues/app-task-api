@@ -2,60 +2,50 @@ function CrudService(model) {
   this.model = model
 }
 
-CrudService.prototype.list = function() {
-  return new Promise(resolve => {
-    this.model.find(null, (err, result) => {
-      return resolve({ data: result })
-    })
-  })
+CrudService.prototype.list = async function() {
+  try {
+    const docs = await this.model.find().select('-__v');
+    return Promise.resolve({ data: docs });
+  } catch (err) {
+    return Promise.reject(err) ;
+  }
 }
 
-CrudService.prototype.insert = function(data) {
-  return new Promise((resolve, reject) => {
-    this.model.create(data, (err, result) => {
-      if (err) {
-        return reject({ err: err})
-      }
-
-      return resolve({ data: result })
-    })
-  })
+CrudService.prototype.insert = async function(data) {
+  try {
+    const doc = await this.model.create(data);
+    return Promise.resolve({ data: doc._id });
+  } catch (err) {
+    return Promise.reject(err) ;
+  }
 }
 
-CrudService.prototype.get = function(id) {
-  return new Promise((resolve, reject) => {
-    this.model.findById(id, (err, result) => {
-      if (err) {
-        return reject({ err: err });
-      }
-
-      return resolve({ data: result });
-    })
-  })
+CrudService.prototype.get = async function(id) {
+  try {
+    const doc = await this.model.findById(id).select('-__v');
+    return Promise.resolve({ data: doc });
+  } catch(err) {
+    return Promise.reject(err);
+  }
 }
 
-CrudService.prototype.update = function(id, data) {
-  return new Promise((resolve, reject) => {
-    this.model.findByIdAndUpdate(id, { $set: data }, (err, result) => {
-      if (err) {
-        return reject({ err: err });
-      }
-
-      return resolve({ data: result });
-    })
-  })
+CrudService.prototype.update = async function(id, data) {
+  try {
+    await this.model.findByIdAndUpdate(id, { $set: data });
+    const doc = await this.model.findById(id).select('-__v');
+    return Promise.resolve({ data: doc });
+  } catch(err) {
+    return Promise.reject(err);
+  }
 }
 
-CrudService.prototype.delete = function(id) {
-  return new Promise((resolve, reject) => {
-    this.model.findByIdAndremove(id, (err, result) => {
-      if (err) {
-        return reject({ err: err });
-      }
-
-      return resolve({ data: result });
-    })
-  })
+CrudService.prototype.delete = async function(id) {
+  try {
+    const result = await this.model.findByIdAndRemove(id);
+    return Promise.resolve({ data: result });
+  } catch (err) {
+    return Promise.reject(err);
+  }
 }
 
 module.exports = CrudService;
